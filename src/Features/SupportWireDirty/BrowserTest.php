@@ -30,43 +30,27 @@ class BrowserTest extends BrowserTestCase
                 HTML;
             }
         })
-            /**
-             * Dirty indicator works while mounted.
-             */
+            ->assertPresent('@dirty')
             ->assertMissing('@dirty')
             ->type('@foo', 'bar')
-            ->assertVisible('@dirty')
-            ->pause(150)
+            ->waitFor('@dirty')
             ->waitForLivewire()->click('@dummy')
-            ->pause(25)
-            ->assertMissing('@dirty')
+            ->waitUntilMissing('@dirty')
 
-            /**
-             * Tear down the wire:dirty element (should run directive cleanup)...
-             */
             ->waitForLivewire()->click('@toggle')
-            ->assertMissing('@dirty')
+            ->waitUntilMissing('@dirty')
 
-            /**
-             * Further commits after teardown must not break the component...
-             */
             ->type('@foo', 'baz')
-            ->pause(150)
             ->waitForLivewire()->click('@dummy')
-            ->pause(25)
-            ->assertMissing('@dirty')
+            ->assertNotPresent('@dirty')
+            ->clear('@foo')
 
-            /**
-             * Re-mount the indicator and ensure dirty tracking still works.
-             */
             ->waitForLivewire()->click('@toggle')
             ->assertMissing('@dirty')
             ->type('@foo', 'qux')
-            ->assertVisible('@dirty') // fails without cleanup
-            ->pause(150)
+            ->waitFor('@dirty') // fails without cleanup
             ->waitForLivewire()->click('@dummy')
-            ->pause(25)
-            ->assertMissing('@dirty')
+            ->waitUntilMissing('@dirty')
         ;
     }
 }
