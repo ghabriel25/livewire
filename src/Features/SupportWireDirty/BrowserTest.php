@@ -32,23 +32,23 @@ class BrowserTest extends BrowserTestCase
         })
             ->assertPresent('@dirty')
             ->assertMissing('@dirty')
-            ->type('@foo', 'bar')
-            ->waitFor('@dirty')
-            ->waitForLivewire()->click('@dummy')
-            ->waitUntilMissing('@dirty')
-
+            ->tap(fn ($b) => $b->script("
+                window.__removedEl = document.querySelector('[dusk=\"dirty\"]')
+            "))
             ->waitForLivewire()->click('@toggle')
-            ->waitUntilMissing('@dirty')
+            ->assertNotPresent('@dirty')
 
-            ->type('@foo', 'baz')
+            ->append('@foo', 'bar')
+            // leaked effect would have display inline-block
+            ->assertScript('window.__removedEl.style.display', '')
             ->waitForLivewire()->click('@dummy')
             ->assertNotPresent('@dirty')
-            ->clear('@foo')
 
             ->waitForLivewire()->click('@toggle')
+            ->assertPresent('@dirty')
             ->assertMissing('@dirty')
-            ->type('@foo', 'qux')
-            ->waitFor('@dirty') // fails without cleanup
+            ->append('@foo', 'baz')
+            ->waitFor('@dirty')
             ->waitForLivewire()->click('@dummy')
             ->waitUntilMissing('@dirty')
         ;
