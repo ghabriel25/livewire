@@ -38,16 +38,17 @@ class BrowserTest extends BrowserTestCase
             ->waitForLivewire()->click('@toggle')
             ->assertNotPresent('@dirty')
 
-            ->append('@foo', 'bar')
+            ->type('@foo', 'bar')
             // leaked effect would have display inline-block
             ->assertScript('window.__removedEl.style.display', '')
             ->waitForLivewire()->click('@dummy')
             ->assertNotPresent('@dirty')
+            ->clear('@foo')
 
             ->waitForLivewire()->click('@toggle')
             ->assertPresent('@dirty')
             ->assertMissing('@dirty')
-            ->append('@foo', 'baz')
+            ->type('@foo', 'baz')
             ->waitFor('@dirty')
             ->waitForLivewire()->click('@dummy')
             ->waitUntilMissing('@dirty')
